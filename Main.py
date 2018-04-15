@@ -41,8 +41,8 @@ def create_competitors(conn, cur):
     cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
     VALUES(?,?,?,?,?,?,?,?,?,?)""", (100000, "Jon Ishii", 3104880439, "M", 26, "Godsinred", 123, 456, 78, 90))
 
-    cur.execute("""INSERT INTO Competitors(name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-    VALUES(?,?,?,?,?,?,?,?,?)""", ("Andrew Ramirez", 3101234567, "M", 22, "Reptar", 12, 23, 45, 67))
+    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+    VALUES(?,?,?,?,?,?,?,?,?,?)""", (100001, "Andrew Ramirez", 3101234567, "M", 22, "Reptar", 12, 23, 45, 67))
 
     conn.commit()
 
@@ -67,9 +67,9 @@ def create_events(conn, cur):
 
     #with open("events.csv", 'r', newline='') as f:
     cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
-                (500000, 600, "SOLO", 100000, -1, -1, -1))
+                (500000, 600, "SOLO", 100000, None, None, None))
     cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
-                (630, "DUO", 100001, 100002, -1, -1))
+                (630, "DUO", 100001, 100002, None, None))
     cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
                 (1600, "SQUAD", 100003, 100004, 100005, 100006))
 
@@ -85,14 +85,18 @@ def create_awards(conn, cur):
 
     cur.execute("""CREATE TABLE Awards(
     event_name TEXT,
-    award TEXT
+    award INTEGER
     );""")
 
-    # with open("awards.csv", 'r', newline='') as f:
-    cur.execute("INSERT INTO Awards(event_name, award) VALUES(?,?)", ("SOLO", 100))
-    cur.execute("INSERT INTO Awards(event_name, award) VALUES(?,?)", ("DUO", 200))
-    cur.execute("INSERT INTO Awards(event_name, award) VALUES(?,?)", ("SQUAD", 400))
-
+    # Event updated fopr awards, should be randomized based on xp of match
+    event= """
+    INSERT INTO Awards(event_name, award)
+    VALUES("SOLO", 100),
+    ("DUO", 200),
+    ("SQUAD", 400)
+    """
+    
+    cur.execute(event)
     conn.commit()
 
 def create_account(conn, cur):
@@ -108,7 +112,6 @@ def create_account(conn, cur):
     conn.commit()
 
 def update_account(conn, cur):
-    num = int(input("Please enter the phone number for the account that you would like to edit: "))
     print("What would you like to update?")
     print("1. name")
     print("2. phone number")
@@ -120,35 +123,33 @@ def update_account(conn, cur):
 
     if choice is 1:
         name = input("Please enter your name: ")
-        cmd = "UPDATE Competitors SET name = \'" + name + "\' WHERE phone_number = " + str(num)
+        cmd = "UPDATE Competitors SET name=" + name
         cur.execute(cmd)
     elif choice is 2:
-        phone_number = input("Please enter your new phone number (i.e. 7149876543):")
-        cmd = "UPDATE Competitors SET phone_number = " + phone_number  + " WHERE phone_number = " + str(num)
+        phone_number = int(input("Please enter your phone number (i.e. 7149876543):"))
+        cmd = "UPDATE Competitors SET phone_number=" + phone_number
         cur.execute(cmd)
     elif choice is 3:
         sex = input("Please enter your sex (M = male, F = female): ").upper()[0]
-        cmd = "UPDATE Competitors SET sex = \'" + sex  + "\' WHERE phone_number = " + str(num)
+        cmd = "UPDATE Competitors SET sex=" + sex
         cur.execute(cmd)
     elif choice is 4:
-        age = input("Please enter your age: ")
-        cmd = "UPDATE Competitors SET age = " + age + " WHERE phone_number = " + str(num)
+        age = int(input("Please enter your age: "))
+        cmd = "UPDATE Competitors SET age=" + age
         cur.execute(cmd)
     elif choice is 5:
         username = input("Please enter your username: ")
-        cmd = "UPDATE Competitors SET username = \'" + username  + "\' WHERE phone_number = " + str(num)
+        cmd = "UPDATE Competitors SET username=" + username
         cur.execute(cmd)
     else:
         print("Invalid choice.")
 
-    conn.commit()
-
 def delete_account(conn, cur):
     print("Please enter the information for the account that you would like to delete.")
     name  = input("name: ")
-    phone_number  = input("phone number: ")
+    phone_number  = int(input("phone number: "))
 
-    cmd = "DELETE FROM Competitors WHERE (name = \'" + name + "\' AND phone_number = " + phone_number + ")"
+    cmd = "DELETE FROM Competitor WHERE (name=" + name + "AND  phone_number=" + phone_number + ")"
     cur.execute(cmd)
 
     conn.commit()
@@ -157,7 +158,7 @@ def create_event(conn, cur):
     print("1. Solo")
     print("2. Duo")
     print("3. Squad")
-    event = int(input("Enter a number for the event type you would like to host? "))
+    event = int(input("Enter a number for the event would you like to host? "))
 
     if event is 1:
         event = "Solo"
@@ -172,7 +173,7 @@ def create_event(conn, cur):
     time = int(input("What time would you like to create the event? "))
 
     cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)"
-    cur.execute(cmd, (time, event, -1, -1, -1, -1))
+    cur.execute(cmd, (time, event, None, None, None, None))
 
     conn.commit()
 
@@ -226,6 +227,32 @@ def show_all_events(conn, cur):
         print("{:<15d}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(e[0], e[1], e[2], e[3],
                                                                   e[4], e[5], e[6]))
 
+def find_user(conn, cur):
+    category = input("Find user from what category: ")
+
+    if category not in ["username", "user_id", "name", "phone_number"]:
+        print("Choose a unique category: ")
+        category = input("Find user from what category: ")
+    
+    cmd_lst = "SELECT * FROM Competitors"
+    cur.execute(cmd_lst)
+    user = cur.fetchall()
+    
+    player_info = input("Enter players {}: ".format(category.replace("_", " ")))
+
+    if player_info[0].isdigit():
+        player_info = int(player_info)
+    else:
+        player_info = player_info.title()
+        
+    lst = []
+    
+    for i in range(len(user)):
+        if player_info in user[i]:
+            lst.extend(user[i])
+    
+    print(lst)
+    
 def main():
 
     conn = sqlite3.connect("fortnite.sqlite")
@@ -274,9 +301,9 @@ def main():
         print("9. Show all male competitors.")
         print("10. Show all female competitors.")
         print("11. Show all events.")
-        print("12. Show all events with competitors.")
-        print("13. Show winners of all events.")
-        print("14. Look up user.")
+        print("11. Show all events with competitors.")
+        print("12. Show winners of all events.")
+        print("13. Look up user.")
         print("\nEnter -1 to quit.")
 
         user_input = int(input("Choice: "))
@@ -308,9 +335,7 @@ def main():
         elif user_input is 12:
             pass
         elif user_input is 13:
-            pass
-        elif user_input is 14:
-            pass
+            find_user(conn, cur)
         else:
             print("Invalid Input: Please enter an integer from the options.")
 
