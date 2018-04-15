@@ -41,8 +41,8 @@ def create_competitors(conn, cur):
     cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
     VALUES(?,?,?,?,?,?,?,?,?,?)""", (100000, "Jon Ishii", 3104880439, "M", 26, "Godsinred", 123, 456, 78, 90))
 
-    cur.execute("""INSERT INTO Competitors(name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-    VALUES(?,?,?,?,?,?,?,?,?,?)""", ("Andrew Ramirez", 3101234567, "M", 22, "Reptar", 12, 23, 45, 67))
+    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+    VALUES(?,?,?,?,?,?,?,?,?,?)""", (100001, "Andrew Ramirez", 3101234567, "M", 22, "Reptar", 12, 23, 45, 67))
 
     conn.commit()
 
@@ -85,14 +85,18 @@ def create_awards(conn, cur):
 
     cur.execute("""CREATE TABLE Awards(
     event_name TEXT,
-    award TEXT
+    award INTEGER
     );""")
 
-    # with open("awards.csv", 'r', newline='') as f:
-    cur.execute("INSERT INTO Awards(event_name, award)", ("SOLO", 100))
-    cur.execute("INSERT INTO Awards(event_name, award)", ("DUO", 200))
-    cur.execute("INSERT INTO Awards(event_name, award)", ("SQUAD", 400))
-
+    # Event updated fopr awards, should be randomized based on xp of match
+    event= """
+    INSERT INTO Awards(event_name, award)
+    VALUES("SOLO", 100),
+    ("DUO", 200),
+    ("SQUAD", 400)
+    """
+    
+    cur.execute(event)
     conn.commit()
 
 def create_account(conn, cur):
