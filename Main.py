@@ -274,9 +274,9 @@ def main():
         print("9. Show all male competitors.")
         print("10. Show all female competitors.")
         print("11. Show all events.")
-        print("11. Show all events with competitors.")
-        print("12. Show winners of all events.")
-        print("13. Look up user.")
+        print("12. Show all events with competitors.")
+        print("13. Show winners of all events.")
+        print("14. Look up user.")
         print("\nEnter -1 to quit.")
 
         user_input = int(input("Choice: "))
@@ -308,6 +308,8 @@ def main():
         elif user_input is 12:
             pass
         elif user_input is 13:
+            pass
+        elif user_input is 14:
             pass
         else:
             print("Invalid Input: Please enter an integer from the options.")
