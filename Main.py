@@ -259,6 +259,33 @@ def find_user(conn, cur):
     for c in user:
         print("{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(c[0], c[1], c[2], c[3], c[4],
                                                                                     c[5], c[6], c[7], c[8], c[9]))
+
+def save_to_csv(cur):
+    with open('competitors.csv', 'r', newline='') as f:
+        read = csv.DictReader(f)
+        header = read.fieldnames
+
+    with open('competitors.csv', 'w', newline='') as f:
+        write = csv.writer(f)
+        write.writerow(header)
+        cur.execute("""SELECT * FROM Competitors""")
+        comps = cur.fetchall()
+        for c in comps:
+            write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6], c[7], c[8], c[9]])
+
+    with open('events.csv', 'r', newline='') as f:
+        read = csv.DictReader(f)
+        header = read.fieldnames
+
+    with open('events.csv', 'w', newline='') as f:
+        write = csv.writer(f)
+        write.writerow(header)
+        cur.execute("""SELECT * FROM Events""")
+        events = cur.fetchall()
+        for c in events:
+            write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
+
+
 def main():
 
     conn = sqlite3.connect("fortnite.sqlite")
@@ -348,6 +375,8 @@ def main():
             print("Invalid Input: Please enter an integer from the options.")
 
 
+
+    save_to_csv(cur)
 
     print("\nThank you for using FortniteCompetitionDB.\nHave a nice day!")
 
