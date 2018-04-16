@@ -37,12 +37,11 @@ def create_competitors(conn, cur):
     games_played INTEGER
     );""")
 
-    # with open("competitors.csv", 'r', newline='') as f:
-    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-    VALUES(?,?,?,?,?,?,?,?,?,?)""", (100000, "Jon Ishii", 3104880439, "M", 26, "Godsinred", 123, 456, 78, 90))
-
-    cur.execute("""INSERT INTO Competitors(name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-    VALUES(?,?,?,?,?,?,?,?,?)""", ("Andrew Ramirez", 3101234567, "M", 22, "Reptar", 12, 23, 45, 67))
+    with open("competitors.csv", 'r', newline='') as f:
+        read = csv.DictReader(f)
+        for e in read:
+            cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+            VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['User'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
 
     conn.commit()
 
@@ -65,13 +64,11 @@ def create_events(conn, cur):
     user_id_4 INTEGER
     );""")
 
-    #with open("events.csv", 'r', newline='') as f:
-    cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
-                (500000, 600, "SOLO", 100000, -1, -1, -1))
-    cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
-                (630, "DUO", 100001, 100002, -1, -1))
-    cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
-                (1600, "SQUAD", 100003, 100004, 100005, 100006))
+    with open("events.csv", 'r', newline='') as f:
+        read = csv.DictReader(f)
+        for e in read:
+            cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
+            (e['ID'],e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4']))
 
     conn.commit()
 
