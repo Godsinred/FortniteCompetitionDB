@@ -294,6 +294,43 @@ def save_to_csv(cur):
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
 
+def show_occupied_events(conn, cur):
+    cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
+    events = cur.fetchall()
+    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
+
+    for e in events:
+        print("{:<15d}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(e[0], e[1], e[2], e[3],
+                                                                  e[4], e[5], e[6]))
+
+def enter_event(conn, cur):
+    uID = int(input("Please enter your user ID: "))
+    eID = int(input("Please enter the ID of the event you would like to sign up for: "))
+    cmd = """ SELECT * FROM Events WHERE event_id=? """
+    cur.execute(cmd, (eID,))
+    e = cur.fetchall()
+    counter = 4
+    index = 0
+    open = True
+    for event in e:
+        print("This event is designated as '" + event[2] + "'.")
+        for i in range(6,2,-1):
+            if event[i] != 0:
+                counter -= 1
+            else:
+                break
+        print("There are " + str(counter) + " open spots.")
+        set_string = "user_id_" + str(counter)
+        if counter > 0:
+            loc = 3 + counter
+            cmd = """ """
+            cur.execute('UPDATE Events SET {user}=? WHERE event_id=?'.\
+                format(user = set_string), (uID, eID))
+            conn.commit()
+            print("Thank you for entering this events, please be availble at " + str(event[1]) + ".")
+        else:
+            print("Sorry, this event is full")            
+
 def main():
 
     conn = sqlite3.connect("fortnite.sqlite")
@@ -360,7 +397,7 @@ def main():
         elif user_input is 4:
             create_event(conn, cur)
         elif user_input is 5:
-            pass
+            enter_event(conn, cur)
         elif user_input is 6:
             pass
         elif user_input is 7:
@@ -374,7 +411,7 @@ def main():
         elif user_input is 11:
             show_all_events(conn, cur)
         elif user_input is 12:
-            pass
+            show_occupied_events(conn, cur)
         elif user_input is 13:
             pass
         elif user_input is 14:
