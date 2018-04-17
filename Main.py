@@ -19,12 +19,13 @@ def create_db(conn, cur):
 def create_competitors(conn, cur):
     """ creates the competitors db. """
 
+    cmd = """SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Competitors'"""
+    cur.execute(cmd)
+    exists = cur.fetchall()
+
     # user_id (primary key), name, phone_number, sex, age, username, kills, deaths, wins, games_played
 
-    # Clean the database
-    cur.execute("""DROP TABLE IF EXISTS Competitors""")
-
-    cur.execute("""CREATE TABLE Competitors(
+    cur.execute("""CREATE TABLE IF NOT EXISTS Competitors(
     user_id INTEGER PRIMARY KEY NOT NULL,
     name TEXT,
     phone_number INTERGER,
@@ -37,11 +38,14 @@ def create_competitors(conn, cur):
     games_played INTEGER
     );""")
 
-    with open("competitors.csv", 'r', newline='') as f:
-        read = csv.DictReader(f)
-        for e in read:
-            cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-            VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['User'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
+    
+    for e in exists:
+        if e[0] == 0:
+            with open("competitors.csv", 'r', newline='') as f:
+                read = csv.DictReader(f)
+                for e in read:
+                    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+                    VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['Username'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
 
     conn.commit()
 
