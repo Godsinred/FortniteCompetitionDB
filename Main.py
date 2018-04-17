@@ -1,3 +1,5 @@
+
+
 """
 Jonathan Ishii
 Andrew Ramirez
@@ -296,7 +298,7 @@ def save_to_csv(cur):
 
 def enter_an_event(conn, cur):
     """ Function to enter into an event. """
-
+    
 def change_event(conn, cur):
     """ Function to change an event you're register for. """
 
