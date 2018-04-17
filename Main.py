@@ -11,13 +11,13 @@ import sqlite3
 import csv
 
 def create_db(conn, cur):
-    # reads in the CSV file and populates the database based off the CSV(s)
+    """ reads in the CSV file and populates the database based off the CSV(s). """
     create_competitors(conn, cur)
     create_events(conn, cur)
     create_awards(conn, cur)
 
 def create_competitors(conn, cur):
-    # creates the competitors db
+    """ creates the competitors db. """
 
     # user_id (primary key), name, phone_number, sex, age, username, kills, deaths, wins, games_played
 
@@ -46,7 +46,7 @@ def create_competitors(conn, cur):
     conn.commit()
 
 def create_events(conn, cur):
-    # creates the event db
+    """ creates the event db. """
 
     # event_id, time, event_name (solo, duo, squad, LTM limited time mode), user_id, team_id, win
 
@@ -73,7 +73,7 @@ def create_events(conn, cur):
     conn.commit()
 
 def create_awards(conn, cur):
-    # creates the awards db
+    """ creates the awards db. """
 
     # (solo_win, duo_win, squad_win) = umbrella , award
 
@@ -93,6 +93,7 @@ def create_awards(conn, cur):
     conn.commit()
 
 def create_account(conn, cur):
+    """ Function to create a competitor's account. """
     name = input("Please enter your name: ")
     phone_number = int(input("Please enter your phone number (i.e. 7149876543):"))
     sex = input("Please enter your sex (M = male, F = female): ").upper()[0]
@@ -105,6 +106,7 @@ def create_account(conn, cur):
     conn.commit()
 
 def update_account(conn, cur):
+    """ Function to edit an existing competitor's account. """
     num = int(input("Please enter the phone number for the account that you would like to edit: "))
     print("What would you like to update?")
     print("1. name")
@@ -141,6 +143,7 @@ def update_account(conn, cur):
     conn.commit()
 
 def delete_account(conn, cur):
+    """ Function to delete a competitor's account. """
     print("Please enter the information for the account that you would like to delete.")
     name  = input("name: ")
     phone_number  = input("phone number: ")
@@ -151,6 +154,7 @@ def delete_account(conn, cur):
     conn.commit()
 
 def create_event(conn, cur):
+    """ Function to create an event. """
     print("1. Solo")
     print("2. Duo")
     print("3. Squad")
@@ -173,8 +177,8 @@ def create_event(conn, cur):
 
     conn.commit()
 
-
 def show_all_competitors(conn, cur):
+    """ Function to display all the competitors. """
     cur.execute("SELECT * FROM Competitors")
     comp = cur.fetchall()
 
@@ -187,6 +191,7 @@ def show_all_competitors(conn, cur):
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_male_competitors(conn, cur):
+    """ Function to display all the male competitors. """
     cur.execute("""SELECT * FROM Competitors
     WHERE sex = 'M'""")
     comp = cur.fetchall()
@@ -200,6 +205,7 @@ def show_all_male_competitors(conn, cur):
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_female_competitors(conn, cur):
+    """ Function to display all the female competitors. """
     cur.execute("""SELECT * FROM Competitors
     WHERE sex = 'F'""")
     comp = cur.fetchall()
@@ -213,6 +219,7 @@ def show_all_female_competitors(conn, cur):
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_events(conn, cur):
+    """ Function to display all events. """
     cur.execute("SELECT * FROM Events")
     all_events = cur.fetchall()
 
@@ -224,6 +231,7 @@ def show_all_events(conn, cur):
                                                                   e[4], e[5], e[6]))
 
 def find_user(conn, cur):
+    """ Function to search for a competitor using a particular field name. """
 
     print("Find user from a category below: ")
     print("1. username")
@@ -261,6 +269,7 @@ def find_user(conn, cur):
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def save_to_csv(cur):
+    """ Function to save data to a csv file. """
     with open('competitors.csv', 'r', newline='') as f:
         read = csv.DictReader(f)
         header = read.fieldnames
@@ -284,7 +293,6 @@ def save_to_csv(cur):
         events = cur.fetchall()
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
-
 
 def main():
 
