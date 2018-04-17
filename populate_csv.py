@@ -77,7 +77,7 @@ def main():
             full_name = full_name + " " + r.choice(last_names)
             
             # ID,Name,Phone,Sex,Age,User,Kills,Deaths,Wins,Games
-            writer.writerow([user_id, full_name.title(), phone, s, r.randint(18, 34), username.title(), r.randint(0, 500), r.randint(0, 500), r.randint(0, 100), r.randint(0, 160)])
+            writer.writerow([user_id, full_name.title().strip('\n'), phone, s, r.randint(18, 34), username.title(), r.randint(0, 500), r.randint(0, 500), r.randint(0, 100), r.randint(0, 160)])
 
         
         print("** Executing players **")
