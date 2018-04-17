@@ -21,12 +21,13 @@ def create_db(conn, cur):
 def create_competitors(conn, cur):
     """ creates the competitors db. """
 
+    cmd = """SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Competitors'"""
+    cur.execute(cmd)
+    exists = cur.fetchall()
+
     # user_id (primary key), name, phone_number, sex, age, username, kills, deaths, wins, games_played
 
-    # Clean the database
-    cur.execute("""DROP TABLE IF EXISTS Competitors""")
-
-    cur.execute("""CREATE TABLE Competitors(
+    cur.execute("""CREATE TABLE IF NOT EXISTS Competitors(
     user_id INTEGER PRIMARY KEY NOT NULL,
     name TEXT,
     phone_number INTERGER,
@@ -39,11 +40,14 @@ def create_competitors(conn, cur):
     games_played INTEGER
     );""")
 
-    with open("competitors.csv", 'r', newline='') as f:
-        read = csv.DictReader(f)
-        for e in read:
-            cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-            VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['User'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
+    
+    for e in exists:
+        if e[0] == 0:
+            with open("competitors.csv", 'r', newline='') as f:
+                read = csv.DictReader(f)
+                for e in read:
+                    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+                    VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['Username'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
 
     conn.commit()
 
@@ -296,20 +300,60 @@ def save_to_csv(cur):
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
 
-def enter_an_event(conn, cur):
+
+def show_all_events_with_competitors(conn, cur):
+    """ function to display all the events with competitors. """
+    cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
+    events = cur.fetchall()
+    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
+
+    for e in events:
+        print("{:<15d}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(e[0], e[1], e[2], e[3],
+                                                                  e[4], e[5], e[6]))
+
+def enter_event(conn, cur):
     """ Function to enter into an event. """
+<<<<<<< HEAD
     
+=======
+    uID = int(input("Please enter your user ID: "))
+    eID = int(input("Please enter the ID of the event you would like to sign up for: "))
+    cmd = """ SELECT * FROM Events WHERE event_id=? """
+    cur.execute(cmd, (eID,))
+    e = cur.fetchall()
+    counter = 4
+    index = 0
+    open = True
+    for event in e:
+        print("This event is designated as '" + event[2] + "'.")
+        for i in range(6,2,-1):
+            if event[i] != 0:
+                counter -= 1
+            else:
+                break
+        print("There are " + str(counter) + " open spots.")
+        set_string = "user_id_" + str(counter)
+        if counter > 0:
+            loc = 3 + counter
+            cmd = """ """
+            cur.execute('UPDATE Events SET {user}=? WHERE event_id=?'.\
+                format(user = set_string), (uID, eID))
+            conn.commit()
+            print("Thank you for entering this events, please be availble at " + str(event[1]) + ".")
+        else:
+            print("Sorry, this event is full")            
+    
+
+>>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
 def change_event(conn, cur):
     """ Function to change an event you're register for. """
 
 def remove_from_event(conn, cur):
     """ Function to remove a competitor from a register event. """
 
-def show_all_events_with_competitors(conn, cur):
-    """ function to display all the events with competitors. """
-
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
+
 
 def main():
 
@@ -377,7 +421,7 @@ def main():
         elif user_input is 4:
             create_event(conn, cur)
         elif user_input is 5:
-            enter_an_event(conn, cur)
+            enter_event(conn, cur)
         elif user_input is 6:
             change_event(conn, cur)
         elif user_input is 7:
