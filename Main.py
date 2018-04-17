@@ -294,7 +294,9 @@ def save_to_csv(cur):
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
 
-def show_occupied_events(conn, cur):
+
+def show_all_events_with_competitors(conn, cur):
+    """ function to display all the events with competitors. """
     cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
     events = cur.fetchall()
     print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
@@ -304,6 +306,7 @@ def show_occupied_events(conn, cur):
                                                                   e[4], e[5], e[6]))
 
 def enter_event(conn, cur):
+    """ Function to enter into an event. """
     uID = int(input("Please enter your user ID: "))
     eID = int(input("Please enter the ID of the event you would like to sign up for: "))
     cmd = """ SELECT * FROM Events WHERE event_id=? """
@@ -330,6 +333,17 @@ def enter_event(conn, cur):
             print("Thank you for entering this events, please be availble at " + str(event[1]) + ".")
         else:
             print("Sorry, this event is full")            
+    
+
+def change_event(conn, cur):
+    """ Function to change an event you're register for. """
+
+def remove_from_event(conn, cur):
+    """ Function to remove a competitor from a register event. """
+
+def show_all_winners(conn, cur):
+    """ Function to display all winners from all events. """
+
 
 def main():
 
@@ -399,9 +413,9 @@ def main():
         elif user_input is 5:
             enter_event(conn, cur)
         elif user_input is 6:
-            pass
+            change_event(conn, cur)
         elif user_input is 7:
-            pass
+            remove_from_event(conn, cur)
         elif user_input is 8:
             show_all_competitors(conn, cur)
         elif user_input is 9:
@@ -411,9 +425,9 @@ def main():
         elif user_input is 11:
             show_all_events(conn, cur)
         elif user_input is 12:
-            show_occupied_events(conn, cur)
+            show_all_events_with_competitors(conn, cur)
         elif user_input is 13:
-            pass
+            show_all_winners(conn, cur)
         elif user_input is 14:
             find_user(conn, cur)
         else:
