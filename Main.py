@@ -294,6 +294,21 @@ def save_to_csv(cur):
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
 
+def enter_an_event(conn, cur):
+    """ Function to enter into an event. """
+
+def change_event(conn, cur):
+    """ Function to change an event you're register for. """
+
+def remove_from_event(conn, cur):
+    """ Function to remove a competitor from a register event. """
+
+def show_all_events_with_competitors(conn, cur):
+    """ function to display all the events with competitors. """
+
+def show_all_winners(conn, cur):
+    """ Function to display all winners from all events. """
+
 def main():
 
     conn = sqlite3.connect("fortnite.sqlite")
@@ -360,11 +375,11 @@ def main():
         elif user_input is 4:
             create_event(conn, cur)
         elif user_input is 5:
-            pass
+            enter_an_event(conn, cur)
         elif user_input is 6:
-            pass
+            change_event(conn, cur)
         elif user_input is 7:
-            pass
+            remove_from_event(conn, cur)
         elif user_input is 8:
             show_all_competitors(conn, cur)
         elif user_input is 9:
@@ -374,9 +389,9 @@ def main():
         elif user_input is 11:
             show_all_events(conn, cur)
         elif user_input is 12:
-            pass
+            show_all_events_with_competitors(conn, cur)
         elif user_input is 13:
-            pass
+            show_all_winners(conn, cur)
         elif user_input is 14:
             find_user(conn, cur)
         else:
