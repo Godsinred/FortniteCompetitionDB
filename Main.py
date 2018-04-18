@@ -1,5 +1,3 @@
-
-
 """
 Jonathan Ishii
 Andrew Ramirez
@@ -300,7 +298,6 @@ def save_to_csv(cur):
         for c in events:
             write.writerow([c[0], c[1], c[2], c[3], c[4], c[5], c[6]]) 
 
-
 def show_all_events_with_competitors(conn, cur):
     """ function to display all the events with competitors. """
     cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
@@ -313,9 +310,8 @@ def show_all_events_with_competitors(conn, cur):
 
 def enter_event(conn, cur):
     """ Function to enter into an event. """
-<<<<<<< HEAD
-    
-=======
+#<<<<<<< HEAD
+#=======
     uID = int(input("Please enter your user ID: "))
     eID = int(input("Please enter the ID of the event you would like to sign up for: "))
     cmd = """ SELECT * FROM Events WHERE event_id=? """
@@ -342,11 +338,39 @@ def enter_event(conn, cur):
             print("Thank you for entering this events, please be availble at " + str(event[1]) + ".")
         else:
             print("Sorry, this event is full")            
-    
 
->>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
+#>>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
+
 def change_event(conn, cur):
     """ Function to change an event you're register for. """
+    show_all_events(conn, cur)
+    print()
+    print("Change an event:")
+    name = input("What is the event name: ").upper()
+    time = int(input("What is the time of the event you want to change: "))
+
+    print("What would you like to change: ")
+    print("1. Event name")
+    print("2. Time")
+    print("3. Event name & Time")
+    choice = int(input("Please make a selection: "))
+
+    if (choice == 1):
+        uname = input("What is the new event name: ").upper()
+        cur.execute("UPDATE Events set event_name = ? where event_name = ? and time = ?", (uname, name, time,))
+        print("Successfully updated the event name.")
+    elif (choice == 2):
+        utime = int(input("Enter the new time: "))
+        cur.execute("UPDATE Events set time = ? where event_name = ? and time = ?", (utime, name, time,))
+        print("Successfully updated the event time.")
+    elif (choice == 3):
+        uname = input("What is the new event name: ").upper()
+        utime = int(input("Enter the new time: "))
+        cur.execute("UPDATE Events set event_name = ?, time = ? where event_name = ? and time = ?", (uname, utime, name, time,))
+        print("Successfully updated the event name and time.")
+    else:
+        print("An error occured. Please try again.")
+    conn.commit()
 
 def remove_from_event(conn, cur):
     """ Function to remove a competitor from a register event. """
