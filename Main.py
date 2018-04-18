@@ -398,7 +398,7 @@ def remove_from_event(conn, cur):
     elif (choice == 4):
         phone = int(input("Phone Number: "))
         cmd = "SELECT user_id FROM Competitors WHERE phone_number = ?"
-        cur.execute(cmd, (phone))
+        cur.execute(cmd, (phone,))
     else:
         print("Invalid input.")
         return #Exit function with no action.
@@ -417,15 +417,15 @@ def remove_from_event(conn, cur):
     events = cur.fetchall()
 
     index = 0
-    pos = 0
     for tup in events:
         items = list(tup)
+        results = list(info[index])
         while (index < len(items)):
-            if items[index] == info[0][0]:
+            if items[index] == results[0]:
                 items[index] = -1
                 break
             index += 1
-        pos += 1
+
         items.pop(0)
         cmd = """
             UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
