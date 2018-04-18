@@ -417,17 +417,20 @@ def remove_from_event(conn, cur):
     events = cur.fetchall()
 
     index = 0
+    pos = 0
     for tup in events:
-        while (index < len(tup)):
-            if tup[index] == info[0][0]:
-                tup[index] = -1
+        items = list(tup)
+        while (index < len(items)):
+            if items[index] == info[0][0]:
+                items[index] = -1
                 break
             index += 1
-
+        pos += 1
+        items.pop(0)
         cmd = """
-            UPDATE Events SET event_id = ?, time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
+            UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
         """
-        cur.execute(cmd, tup)
+        cur.execute(cmd, items)
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
