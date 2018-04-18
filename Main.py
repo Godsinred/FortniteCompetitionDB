@@ -9,6 +9,9 @@ Lab 2
 
 import sqlite3
 import csv
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 def create_db(conn, cur):
     """ reads in the CSV file and populates the database based off the CSV(s). """
@@ -19,13 +22,13 @@ def create_db(conn, cur):
 def create_competitors(conn, cur):
     """ creates the competitors db. """
 
-    cmd = """SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Competitors'"""
-    cur.execute(cmd)
-    exists = cur.fetchall()
+    # cmd = """SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Competitors'"""
+    # cur.execute(cmd)
+    # exists = cur.fetchall()
 
     # user_id (primary key), name, phone_number, sex, age, username, kills, deaths, wins, games_played
-
-    cur.execute("""CREATE TABLE IF NOT EXISTS Competitors(
+    cur.execute("""DROP TABLE IF EXISTS Competitors""")
+    cur.execute("""CREATE TABLE Competitors(
     user_id INTEGER PRIMARY KEY NOT NULL,
     name TEXT,
     phone_number INTERGER,
@@ -38,14 +41,17 @@ def create_competitors(conn, cur):
     games_played INTEGER
     );""")
 
-    
-    for e in exists:
-        if e[0] == 0:
-            with open("competitors.csv", 'r', newline='') as f:
-                read = csv.DictReader(f)
-                for e in read:
-                    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
-                    VALUES(?,?,?,?,?,?,?,?,?,?)""", (e['ID'],e['Name'],e['Phone'],e['Sex'],e['Age'],e['Username'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
+    cur.execute("""INSERT INTO Competitors(user_id, name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+                        VALUES(?,?,?,?,?,?,?,?,?,?)""", (100000, "First User", 1234567890, 'M', 12, 'test_user', 123, 456, 34, 45))
+
+
+    #for e in exists:
+        #if e[0] == 0:
+    with open("competitors.csv", 'r', newline='') as f:
+        read = csv.DictReader(f)
+        for e in read:
+            cur.execute("""INSERT INTO Competitors(name, phone_number, sex, age, username, kills, deaths, wins, games_played)
+            VALUES(?,?,?,?,?,?,?,?,?)""", (e['Name'],e['Phone'],e['Sex'],e['Age'],e['Username'],e['Kills'],e['Deaths'],e['Wins'],e['Games']))
 
     conn.commit()
 
@@ -68,11 +74,13 @@ def create_events(conn, cur):
     user_id_4 INTEGER
     );""")
 
+    cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
+                (500000, 1111, 'test_event_name', 100000, 100001, 100002, 100003))
     with open("events.csv", 'r', newline='') as f:
         read = csv.DictReader(f)
         for e in read:
-            cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
-            (e['ID'],e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4']))
+            cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
+            (e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4']))
 
     conn.commit()
 
@@ -183,55 +191,59 @@ def create_event(conn, cur):
 
 def show_all_competitors(conn, cur):
     """ Function to display all the competitors. """
-    cur.execute("SELECT * FROM Competitors")
+    cur.execute("""SELECT * FROM Competitors
+    ORDER BY name""")
     comp = cur.fetchall()
 
     print("\nShowing all competitors.")
-    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("user_id", "name", "phone_number", "sex",
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("user_id", "name", "phone_number", "sex",
                                                                               "age", "username", "kills", "deaths",
                                                                               "wins", "games_played"))
     for c in comp:
-        print("{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(c[0], c[1], c[2], c[3], c[4],
+        print("{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(c[0], c[1], c[2], c[3], c[4],
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_male_competitors(conn, cur):
     """ Function to display all the male competitors. """
     cur.execute("""SELECT * FROM Competitors
-    WHERE sex = 'M'""")
+    WHERE sex = 'M'
+    ORDER BY name""")
     comp = cur.fetchall()
 
     print("\nShowing all male competitors.")
-    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("user_id", "name", "phone_number", "sex",
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("user_id", "name", "phone_number", "sex",
                                                                               "age", "username", "kills", "deaths",
                                                                               "wins", "games_played"))
     for c in comp:
-        print("{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(c[0], c[1], c[2], c[3], c[4],
+        print("{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(c[0], c[1], c[2], c[3], c[4],
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_female_competitors(conn, cur):
     """ Function to display all the female competitors. """
     cur.execute("""SELECT * FROM Competitors
-    WHERE sex = 'F'""")
+    WHERE sex = 'F'
+    ORDER BY name""")
     comp = cur.fetchall()
 
     print("\nShowing all female competitors.")
-    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("user_id", "name", "phone_number", "sex",
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("user_id", "name", "phone_number", "sex",
                                                                               "age", "username", "kills", "deaths",
                                                                               "wins", "games_played"))
     for c in comp:
-        print("{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(c[0], c[1], c[2], c[3], c[4],
+        print("{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(c[0], c[1], c[2], c[3], c[4],
                                                                                     c[5], c[6], c[7], c[8], c[9]))
 
 def show_all_events(conn, cur):
     """ Function to display all events. """
-    cur.execute("SELECT * FROM Events")
+    cur.execute("""SELECT * FROM Events
+    ORDER BY time""")
     all_events = cur.fetchall()
 
     print("\nShowing all events.")
-    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
 
     for e in all_events:
-        print("{:<15d}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(e[0], e[1], e[2], e[3],
+        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], e[3],
                                                                   e[4], e[5], e[6]))
 
 def find_user(conn, cur):
@@ -370,8 +382,6 @@ def change_event(conn, cur):
         print("Successfully updated the event name and time.")
     else:
         print("An error occured. Please try again.")
-        return #Exit function with no action.
-
     conn.commit()
 
 def remove_from_event(conn, cur):
@@ -382,7 +392,7 @@ def remove_from_event(conn, cur):
     print("3. name")
     print("4. phone number")
     choice  = int(input("Choice: "))
-
+    
     if (choice == 1):
         username = input("Username: ")
         cmd = "SELECT user_id FROM Competitors WHERE  username = ?"
@@ -429,12 +439,36 @@ def remove_from_event(conn, cur):
         items.pop(0)
         cmd = """
             UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
-        """
+            """
         cur.execute(cmd, items)
     conn.commit()
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
+
+def graph_leaderboards(conn, cur):
+    """ Function to grpah the leaderboards for all the events. """
+
+    cur.execute("""SELECT COUNT(user_id) as total, wins
+    FROM Competitors
+    GROUP BY wins
+    ORDER BY wins
+    """)
+    data = cur.fetchall()
+
+    x= []
+    y = []
+    for i in data:
+        print(i)
+        x.append(i[1])
+        y.append(i[0])
+
+    fig = plt.figure()
+    graph = fig.subplots(1,1)
+    graph.plot(x,y)
+    graph.set_xlabel("Total Number of Wins")
+    graph.set_ylabel("Total Number of People")
+    fig.savefig("leaderboards.png")
 
 
 def main():
@@ -488,6 +522,7 @@ def main():
         print("12. Show all events with competitors.")
         print("13. Show winners of all events.")
         print("14. Look up user.")
+        print("15. Leaderboard graph.")
         print("\nEnter -1 to quit.")
 
         user_input = int(input("Choice: "))
@@ -522,12 +557,14 @@ def main():
             show_all_winners(conn, cur)
         elif user_input is 14:
             find_user(conn, cur)
+        elif user_input is 15:
+            graph_leaderboards(conn, cur)
         else:
             print("Invalid Input: Please enter an integer from the options.")
 
 
 
-    save_to_csv(cur)
+    #save_to_csv(cur)
 
     print("\nThank you for using FortniteCompetitionDB.\nHave a nice day!")
 
