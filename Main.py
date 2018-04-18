@@ -340,13 +340,13 @@ def enter_event(conn, cur):
     cmd = """ SELECT * FROM Events WHERE event_id=? """
     cur.execute(cmd, (eID,))
     e = cur.fetchall()
-    counter = 4
+    counter = 10
     index = 0
     open = True
     for event in e:
         print("This event is designated as '" + event[2] + "'.")
         for i in range(12,2,-1):
-            if event[i] != 0:
+            if event[i] != -1:
                 counter -= 1
             else:
                 break
