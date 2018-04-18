@@ -345,7 +345,7 @@ def enter_event(conn, cur):
     open = True
     for event in e:
         print("This event is designated as '" + event[2] + "'.")
-        for i in range(6,2,-1):
+        for i in range(12,2,-1):
             if event[i] != 0:
                 counter -= 1
             else:
