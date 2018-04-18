@@ -310,8 +310,8 @@ def show_all_events_with_competitors(conn, cur):
 
 def enter_event(conn, cur):
     """ Function to enter into an event. """
-#<<<<<<< HEAD
-#=======
+<<<<<<< HEAD
+=======
     uID = int(input("Please enter your user ID: "))
     eID = int(input("Please enter the ID of the event you would like to sign up for: "))
     cmd = """ SELECT * FROM Events WHERE event_id=? """
@@ -339,7 +339,7 @@ def enter_event(conn, cur):
         else:
             print("Sorry, this event is full")            
 
-#>>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
+>>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
 
 def change_event(conn, cur):
     """ Function to change an event you're register for. """
@@ -431,6 +431,7 @@ def remove_from_event(conn, cur):
             UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
         """
         cur.execute(cmd, items)
+    conn.commit()
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
