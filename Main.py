@@ -77,17 +77,44 @@ def create_events(conn, cur):
     user_id_7 INTEGER,
     user_id_8 INTEGER,
     user_id_9 INTEGER,
-    user_id_10 INTEGER
+    user_id_10 INTEGER,
+    winner_team_id INTEGER
     );""")
 
-    cur.execute("""INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10)
-    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""", (500000, 1111, 'test_event_name', 100000, 100001, 100002, 100003, 100004,100005,100006,100007,100008,100009))
+    tid = 400000
+    cur.execute("""INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10, winner_team_id)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (500000, 1745, 'TEST_EVENT_NAME', 100000, 100001, 100002, 100003, 100004,100005,100006,100007,100008,100009, tid))
+    tid +=1
     with open("events.csv", 'r', newline='') as f:
         read = csv.DictReader(f)
         for e in read:
-            cur.execute("""INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""",
-            (e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4'],e['user_5'],e['user_6'],e['user_7'],e['user_8'],e['user_9'],e['user_10']))
+            cur.execute("""INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10, winner_team_id)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4'],e['user_5'],e['user_6'],e['user_7'],e['user_8'],e['user_9'],e['user_10'], tid))
+            tid += 1
+
+    conn.commit()
+
+    cur.execute("""DROP TABLE IF EXISTS Teams""")
+
+    # user_id's are the winners for the games
+    cur.execute("""CREATE TABLE Teams(
+    winner_team_id INTEGER,
+    user_id_1 INTEGER,
+    user_id_2 INTEGER,
+    user_id_3 INTEGER,
+    user_id_4 INTEGER
+    );""")
+
+    cur.execute("""INSERT INTO Teams(winner_team_id, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?)""", (400000, 100000, -1, -1, -1))
+    cur.execute("""INSERT INTO Teams(winner_team_id, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?)""",
+                (400001, 100001, -1, -1, -1))
+    cur.execute("""INSERT INTO Teams(winner_team_id, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?)""",
+                (400002, 100005, -1, -1, -1))
+    cur.execute("""INSERT INTO Teams(winner_team_id, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?)""",
+                (400003, 100003, 100004, -1, -1))
+    cur.execute("""INSERT INTO Teams(winner_team_id, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?)""",
+                (400004, 100001, 100002, 100005, 100006))
 
     conn.commit()
 
@@ -191,9 +218,9 @@ def create_event(conn, cur):
 
     time = int(input("What time would you like to create the event? "))
 
-    cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10) " \
-          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
-    cur.execute(cmd, (time, event, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1))
+    cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10, winner_team_id) " \
+          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    cur.execute(cmd, (time, event, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1))
 
     conn.commit()
 
@@ -322,14 +349,14 @@ def show_all_events_with_competitors(conn, cur):
     cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
     events = cur.fetchall()
     print("Showing all events with competitors.")
-    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time",
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time",
                                                             "event_name", "user_id_1", "user_id_2",
                                                               "user_id_3", "user_id_4", "user_id_5", "user_id_6", "user_id_7",
-                                                              "user_id_8", "user_id_9", "user_id_10"))
+                                                              "user_id_8", "user_id_9", "user_id_10", "winner_team_id"))
 
     for e in events:
-        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], e[3],
-                                                                  e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12]))
+        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], e[3],
+                                                                  e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12], e[13]))
 
 def enter_event(conn, cur):
     """ Function to enter into an event. """
@@ -340,23 +367,23 @@ def enter_event(conn, cur):
     cmd = """ SELECT * FROM Events WHERE event_id=? """
     cur.execute(cmd, (eID,))
     e = cur.fetchall()
-    counter = 10
-    index = 0
+    counter = 13
+
     open = True
     for event in e:
         print("This event is designated as '" + event[2] + "'.")
-        for i in range(12,2,-1):
-            if event[i] != -1:
-                counter -= 1
+        for i in range(12, 2, -1):
+            if event[i] is -1:
+                print(i)
+                counter = i
             else:
                 break
-        print("There are " + str(counter) + " open spots.")
+        print("There are " + str(13 - counter) + " open spots.")
         set_string = "user_id_" + str(counter)
-        if counter > 0:
-            loc = 3 + counter
-            cmd = """ """
-            cur.execute('UPDATE Events SET {user}=? WHERE event_id=?'.\
-                format(user = set_string), (uID, eID))
+        if counter < 13:
+            print(counter)
+            cmd = "UPDATE Events SET user_id_"+ str(counter -2) + " = " + str(uID) + " WHERE event_id = " + str(eID)
+            cur.execute(cmd)
             conn.commit()
             print("Thank you for entering this events, please be availble at " + str(event[1]) + ".")
         else:
@@ -424,38 +451,49 @@ def remove_from_event(conn, cur):
         print("Invalid input.")
         return #Exit function with no action.
 
-    info = cur.fetchall()
+    info = cur.fetchone()
+    print(info)
 
-    show_all_events(conn, cur)
+    show_all_events_with_competitors(conn, cur)
     print()
     print("Unsubscribe from event:")
-    event = input("What is the event name: ").upper()
-    time = int(input("What is the time of the event you want to unsubscribe from: "))
+    event = input("What is the event id: ")
 
-    cmd = "SELECT * FROM Events where event_name = ? and time = ?"
-    cur.execute(cmd, (event, time,))
+    cmd = "SELECT * FROM Events where event_id = ?"
+    cur.execute(cmd, (event,))
 
-    events = cur.fetchall()
+    events = cur.fetchone()
 
-    index = 0
-    for tup in events:
-        items = list(tup)
-        results = list(info[index])
-        while (index < len(items)):
-            if items[index] == results[0]:
-                items[index] = -1
-                break
-            index += 1
+    index = -1
 
-        items.pop(0)
-        cmd = """
-            UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?, user_id_5 = ?,
-            user_id_6 = ?, user_id_7 = ?, user_id_8 = ?, user_id_9 = ?, user_id_10 = ?
-            """
-        cur.execute(cmd, items)
+    for i in range(len(events)):
+        if events[i] == info[0]:
+            index = i -  2
+            break
+
+    cmd = "UPDATE Events SET user_id_" + str(index) + " = -1 WHERE event_id = " + str(event)
+
+    cur.execute(cmd)
+    conn.commit()
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
+
+    cur.execute("""SELECT event_id, time, event_name, winner_team_id
+    FROM Events""")
+
+    winners = cur.fetchall()
+
+    print("Showing all winners for all events.")
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time", "event_name", "winner_user_id_1", "winner_user_id_2", "winner_user_id_3", "winner_user_id_4"))
+
+    for e in winners:
+        cmd = "SELECT user_id_1, user_id_2, user_id_3, user_id_4 FROM Teams WHERE winner_team_id = " + str(e[3])
+        cur.execute(cmd)
+        uid = cur.fetchone()
+        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], uid[0], uid[1], uid[2], uid[3]))
+
+
 
 def graph_leaderboards(conn, cur):
     """ Function to grpah the leaderboards for all the events. """
