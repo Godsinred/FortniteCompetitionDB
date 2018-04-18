@@ -71,16 +71,23 @@ def create_events(conn, cur):
     user_id_1 INTEGER,
     user_id_2 INTEGER,
     user_id_3 INTEGER,
-    user_id_4 INTEGER
+    user_id_4 INTEGER,
+    user_id_5 INTEGER,
+    user_id_6 INTEGER,
+    user_id_7 INTEGER,
+    user_id_8 INTEGER,
+    user_id_9 INTEGER,
+    user_id_10 INTEGER
     );""")
 
-    cur.execute("INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?,?)",
-                (500000, 1111, 'test_event_name', 100000, 100001, 100002, 100003))
+    cur.execute("""INSERT INTO Events(event_id, time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10)
+    VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)""", (500000, 1111, 'test_event_name', 100000, 100001, 100002, 100003, 100004,100005,100006,100007,100008,100009))
     with open("events.csv", 'r', newline='') as f:
         read = csv.DictReader(f)
         for e in read:
-            cur.execute("INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)",
-            (e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4']))
+            cur.execute("""INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (e['time'],e['name'],e['user_1'],e['user_2'],e['user_3'],e['user_4'],e['user_5'],e['user_6'],e['user_7'],e['user_8'],e['user_9'],e['user_10']))
 
     conn.commit()
 
@@ -184,8 +191,9 @@ def create_event(conn, cur):
 
     time = int(input("What time would you like to create the event? "))
 
-    cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4) VALUES(?,?,?,?,?,?)"
-    cur.execute(cmd, (time, event, -1, -1, -1, -1))
+    cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10) " \
+          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)"
+    cur.execute(cmd, (time, event, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1))
 
     conn.commit()
 
@@ -240,11 +248,10 @@ def show_all_events(conn, cur):
     all_events = cur.fetchall()
 
     print("\nShowing all events.")
-    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
+    print("{:20s}{:20s}{:20s}".format("event_id", "time", "event_name"))
 
     for e in all_events:
-        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], e[3],
-                                                                  e[4], e[5], e[6]))
+        print("{:<20d}{:<20d}{:20s}".format(e[0], e[1], e[2]))
 
 def find_user(conn, cur):
     """ Function to search for a competitor using a particular field name. """
@@ -314,16 +321,20 @@ def show_all_events_with_competitors(conn, cur):
     """ function to display all the events with competitors. """
     cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
     events = cur.fetchall()
-    print("{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("event_id", "time", "event_name", "user_id_1", "user_id_2", "user_id_3", "user_id_4"))
+    print("Showing all events with competitors.")
+    print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time",
+                                                            "event_name", "user_id_1", "user_id_2",
+                                                              "user_id_3", "user_id_4", "user_id_5", "user_id_6", "user_id_7",
+                                                              "user_id_8", "user_id_9", "user_id_10"))
 
     for e in events:
-        print("{:<15d}{:<15d}{:15s}{:<15d}{:<15d}{:<15d}{:<15d}".format(e[0], e[1], e[2], e[3],
-                                                                  e[4], e[5], e[6]))
+        print("{:<20d}{:<20d}{:20s}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}{:<20d}".format(e[0], e[1], e[2], e[3],
+                                                                  e[4], e[5], e[6], e[7], e[8], e[9], e[10], e[11], e[12]))
 
 def enter_event(conn, cur):
     """ Function to enter into an event. """
-<<<<<<< HEAD
-=======
+#<<<<<<< HEAD
+#=======
     uID = int(input("Please enter your user ID: "))
     eID = int(input("Please enter the ID of the event you would like to sign up for: "))
     cmd = """ SELECT * FROM Events WHERE event_id=? """
@@ -351,7 +362,7 @@ def enter_event(conn, cur):
         else:
             print("Sorry, this event is full")            
 
->>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
+#>>>>>>> 1f7b0c1ea1e3b991b76ddfa73e7874a7fe62e358
 
 def change_event(conn, cur):
     """ Function to change an event you're register for. """
@@ -438,10 +449,10 @@ def remove_from_event(conn, cur):
 
         items.pop(0)
         cmd = """
-            UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
+            UPDATE Events SET time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?, user_id_5 = ?,
+            user_id_6 = ?, user_id_7 = ?, user_id_8 = ?, user_id_9 = ?, user_id_10 = ?
             """
         cur.execute(cmd, items)
-    conn.commit()
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
@@ -459,7 +470,6 @@ def graph_leaderboards(conn, cur):
     x= []
     y = []
     for i in data:
-        print(i)
         x.append(i[1])
         y.append(i[0])
 
