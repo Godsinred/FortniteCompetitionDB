@@ -370,10 +370,64 @@ def change_event(conn, cur):
         print("Successfully updated the event name and time.")
     else:
         print("An error occured. Please try again.")
+        return #Exit function with no action.
+
     conn.commit()
 
 def remove_from_event(conn, cur):
     """ Function to remove a competitor from a register event. """
+    print("Use one of the options below to look up the user ID to unsubscribe: ")
+    print("1. username")
+    print("2. user id")
+    print("3. name")
+    print("4. phone number")
+    choice  = int(input("Choice: "))
+
+    if (choice == 1):
+        username = input("Username: ")
+        cmd = "SELECT user_id FROM Competitors WHERE  username = ?"
+        cur.execute(cmd, (username,))
+    elif (choice == 2):
+        id = int(input("User ID: "))
+        cmd = "SELECT user_id FROM Competitors WHERE user_id = ?"
+        cur.execute(cmd, (id,))
+    elif (choice == 3):
+        name = input("Name: ")
+        cmd = "SELECT username FROM Competitors WHERE name = ?"
+        cur.execute(cmd, (name,))
+    elif (choice == 4):
+        phone = int(input("Phone Number: "))
+        cmd = "SELECT user_id FROM Competitors WHERE phone_number = ?"
+        cur.execute(cmd, (phone))
+    else:
+        print("Invalid input.")
+        return #Exit function with no action.
+
+    info = cur.fetchall()
+
+    show_all_events(conn, cur)
+    print()
+    print("Unsubscribe from event:")
+    event = input("What is the event name: ").upper()
+    time = int(input("What is the time of the event you want to unsubscribe from: "))
+
+    cmd = "SELECT * FROM Events where event_name = ? and time = ?"
+    cur.execute(cmd, (event, time,))
+
+    events = cur.fetchall()
+
+    index = 0
+    for tup in events:
+        while (index < len(tup)):
+            if tup[index] == info[0][0]:
+                tup[index] = -1
+                break
+            index += 1
+
+        cmd = """
+            UPDATE Events SET event_id = ?, time = ?, event_name = ?, user_id_1 = ?, user_id_2 = ?, user_id_3 = ?, user_id_4 = ?
+        """
+        cur.execute(cmd, tup)
 
 def show_all_winners(conn, cur):
     """ Function to display all winners from all events. """
