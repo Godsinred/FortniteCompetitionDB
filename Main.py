@@ -10,7 +10,7 @@ Lab 2
 import sqlite3
 import csv
 import matplotlib
-matplotlib.use("Agg")
+#matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 def create_db(conn, cur):
@@ -219,7 +219,7 @@ def create_event(conn, cur):
     time = int(input("What time would you like to create the event? "))
 
     cmd = "INSERT INTO Events(time, event_name, user_id_1, user_id_2, user_id_3, user_id_4, user_id_5, user_id_6, user_id_7, user_id_8, user_id_9, user_id_10, winner_team_id) " \
-          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+          "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"
     cur.execute(cmd, (time, event, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1))
 
     conn.commit()
@@ -346,7 +346,8 @@ def save_to_csv(cur):
 
 def show_all_events_with_competitors(conn, cur):
     """ function to display all the events with competitors. """
-    cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1""")
+    cur.execute("""SELECT * FROM Events WHERE user_id_1 != -1 OR user_id_2 != -1 OR user_id_3 != -1 OR
+    user_id_4 != -1 OR user_id_5 != -1 OR user_id_6 != -1 OR user_id_7 != -1 OR user_id_8 != -1 OR user_id_9 != -1 OR user_id_10 != -1""")
     events = cur.fetchall()
     print("Showing all events with competitors.")
     print("{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}{:20s}".format("event_id", "time",
@@ -374,14 +375,12 @@ def enter_event(conn, cur):
         print("This event is designated as '" + event[2] + "'.")
         for i in range(12, 2, -1):
             if event[i] is -1:
-                print(i)
                 counter = i
             else:
                 break
         print("There are " + str(13 - counter) + " open spots.")
         set_string = "user_id_" + str(counter)
         if counter < 13:
-            print(counter)
             cmd = "UPDATE Events SET user_id_"+ str(counter -2) + " = " + str(uID) + " WHERE event_id = " + str(eID)
             cur.execute(cmd)
             conn.commit()
@@ -452,7 +451,6 @@ def remove_from_event(conn, cur):
         return #Exit function with no action.
 
     info = cur.fetchone()
-    print(info)
 
     show_all_events_with_competitors(conn, cur)
     print()
@@ -517,6 +515,7 @@ def graph_leaderboards(conn, cur):
     graph.set_xlabel("Total Number of Wins")
     graph.set_ylabel("Total Number of People")
     fig.savefig("leaderboards.png")
+    fig.show()
 
 
 def main():
