@@ -392,8 +392,8 @@ def remove_from_event(conn, cur):
         cmd = "SELECT user_id FROM Competitors WHERE user_id = ?"
         cur.execute(cmd, (id,))
     elif (choice == 3):
-        name = input("Name: ")
-        cmd = "SELECT username FROM Competitors WHERE name = ?"
+        name = input("Name: ").lower().title()
+        cmd = "SELECT user_id FROM Competitors WHERE name = ?"
         cur.execute(cmd, (name,))
     elif (choice == 4):
         phone = int(input("Phone Number: "))
